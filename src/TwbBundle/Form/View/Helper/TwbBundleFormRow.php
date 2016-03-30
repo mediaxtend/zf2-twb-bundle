@@ -15,7 +15,7 @@ class TwbBundleFormRow extends FormRow
     /**
      * @var string
      */
-    protected static $formGroupFormat = '<div class="form-group %s">%s</div>';
+    protected static $formGroupFormat = '<div class="form-group%s"%s>%s</div>';
 
     /**
      * @var string
@@ -103,7 +103,7 @@ class TwbBundleFormRow extends FormRow
                 return $sElementContent . PHP_EOL;
             default:
                 // Render element into form group
-                return $this->renderElementFormGroup($sElementContent, $this->getRowClassFromElement($oElement));
+                return $this->renderElementFormGroup($sElementContent, $this->getRowClassFromElement($oElement), $this->getAttributesFromElement($oElement));
         }
     }
 
@@ -115,7 +115,7 @@ class TwbBundleFormRow extends FormRow
     {
         $sRowClass = '';
         if ($sFormGroupSize = $oElement->getOption('twb-form-group-size')) {
-            $sRowClass = $sFormGroupSize;
+            $sRowClass = ' ' . $sFormGroupSize;
         }
 
         // Validation state
@@ -135,12 +135,23 @@ class TwbBundleFormRow extends FormRow
     }
 
     /**
+     * @param ElementInterface $oElement
+     * @return string
+     */
+    public function getAttributesFromElement(\Zend\Form\ElementInterface $oElement)
+    {
+        $aAttributes = $oElement->getOption('group_attributes');
+        return is_array($aAttributes) ? ' ' . $this->createAttributesString($aAttributes) : '';
+    }
+
+    /**
      * @param string $sElementContent
      * @param string $sRowClass
+     * @param string $sElementAttributes
      * @return string
      * @throws \InvalidArgumentException
      */
-    public function renderElementFormGroup($sElementContent, $sRowClass)
+    public function renderElementFormGroup($sElementContent, $sRowClass, $sElementAttributes)
     {
         if (!is_string($sElementContent)) {
             throw new \InvalidArgumentException('Argument "$sElementContent" expects a string, "' . (is_object($sElementContent) ? get_class($sElementContent) : gettype($sElementContent)) . '" given');
@@ -148,7 +159,10 @@ class TwbBundleFormRow extends FormRow
         if (!is_string($sRowClass)) {
             throw new \InvalidArgumentException('Argument "$sRowClass" expects a string, "' . (is_object($sRowClass) ? get_class($sRowClass) : gettype($sRowClass)) . '" given');
         }
-        return sprintf(self::$formGroupFormat, $sRowClass, $sElementContent) . PHP_EOL;
+        if (!is_string($sElementAttributes)) {
+            throw new \InvalidArgumentException('Argument "$sElementAttributes" expects a string, "' . (is_object($sElementAttributes) ? get_class($sElementAttributes) : gettype($sElementAttributes)) . '" given');
+        }
+        return sprintf(self::$formGroupFormat, $sRowClass, $sElementAttributes, $sElementContent) . PHP_EOL;
     }
 
     /**
