@@ -297,7 +297,11 @@ class TwbBundleFormRow extends FormRow
                 return $sElementContent;
 
             case TwbBundleForm::LAYOUT_HORIZONTAL:
-                $sElementContent = $this->getElementHelper()->render($oElement) . $this->renderHelpBlock($oElement);
+                if ($oElement->getOption('help-block_position') === self::LABEL_PREPEND) {
+                    $sElementContent = $this->renderHelpBlock($oElement) . $this->getElementHelper()->render($oElement);
+                } else {
+                    $sElementContent = $this->getElementHelper()->render($oElement) . $this->renderHelpBlock($oElement);
+                }
 
                 //Render errors
                 if ($this->renderErrors) {
